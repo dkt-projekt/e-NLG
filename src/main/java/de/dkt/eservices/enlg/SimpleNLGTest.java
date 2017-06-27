@@ -2,13 +2,18 @@ package de.dkt.eservices.enlg;
 
 import java.util.HashMap;
 
+import simplenlg.aggregation.AggregationRule;
+import simplenlg.aggregation.BackwardConjunctionReductionRule;
+import simplenlg.aggregation.ForwardConjunctionReductionRule;
 import simplenlg.features.Feature;
 import simplenlg.features.InterrogativeType;
 import simplenlg.features.Tense;
 import simplenlg.framework.CoordinatedPhraseElement;
 import simplenlg.framework.NLGElement;
 import simplenlg.framework.NLGFactory;
+import simplenlg.framework.PhraseCategory;
 import simplenlg.lexicon.Lexicon;
+import simplenlg.morphology.english.DeterminerAgrHelper;
 import simplenlg.phrasespec.SPhraseSpec;
 import simplenlg.realiser.english.Realiser;
 
@@ -63,13 +68,41 @@ public class SimpleNLGTest {
 		hm.put("contain", "3GB RAM memory");
 		hm.put("offer", "6 inch screen");
 		hm.put("load", "30 minutes");
-		hm.put("have", "20 Mpx camera");
+		//hm.put("have", "20 Mpx camera");
+		hm.put("have", "elephant");
+		// TODO: try something with same verb...
 		t.features=hm;
 		
 		String text = ng.generateTextFromTemplate(t);
-		System.out.println(text);
+		System.out.println("plain:\t\t" + text);
 		String text2 = ng.generateCoordinateTextFromTemplate(t);
-		System.out.println(text2);
+		System.out.println("simple coord:\t" + text2);
+
+		Lexicon lexicon = Lexicon.getDefaultLexicon();
+		Realiser realiser = new Realiser(lexicon);
+		NLGFactory nlgFactory = new NLGFactory(lexicon);
+		
+		
+		ForwardConjunctionReductionRule fcr = new ForwardConjunctionReductionRule();
+		BackwardConjunctionReductionRule bcr = new BackwardConjunctionReductionRule();
+		
+		CoordinatedPhraseElement c1 = nlgFactory.createCoordinatedPhrase();
+		DeterminerAgrHelper dah = new DeterminerAgrHelper();
+		for (String key : hm.keySet()){
+			SPhraseSpec s = null;
+			if (dah.requiresAn(hm.get(key))){
+				s = nlgFactory.createClause(t.getObjectName(), key, "an " + hm.get(key));
+			}
+			else{
+				s = nlgFactory.createClause(t.getObjectName(), key, "a " + hm.get(key));
+			}
+			c1.addCoordinate(s);
+		}
+		fcr.apply(c1);
+		System.out.println("fcr:\t\t" + realiser.realiseSentence(c1));
+		bcr.apply(c1);
+		System.out.println("bcr:\t\t" + realiser.realiseSentence(c1));
+		
 		
 	}
 
