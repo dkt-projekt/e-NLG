@@ -93,8 +93,8 @@ public class SimpleNLGTest {
 		Lexicon lexicon = Lexicon.getDefaultLexicon();
 		Realiser realiser = new Realiser(lexicon);
 		NLGFactory nlgFactory = new NLGFactory(lexicon);
-		
-		
+		// TODO: check out grammatical framework.org as text generation tool
+		// TODO: check out rdf2text
 		ForwardConjunctionReductionRule fcr = new ForwardConjunctionReductionRule();
 		BackwardConjunctionReductionRule bcr = new BackwardConjunctionReductionRule();
 		
