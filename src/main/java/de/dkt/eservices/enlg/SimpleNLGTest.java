@@ -1,7 +1,12 @@
 package de.dkt.eservices.enlg;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
+import de.dkt.eservices.enlg.realization.TextRealizer;
+import de.dkt.eservices.enlg.template.Template;
+import de.dkt.eservices.enlg.template.TemplateGenerator;
 import simplenlg.aggregation.AggregationRule;
 import simplenlg.aggregation.BackwardConjunctionReductionRule;
 import simplenlg.aggregation.ForwardConjunctionReductionRule;
@@ -60,8 +65,15 @@ public class SimpleNLGTest {
 //
 //	    System.out.println( realiser.realiseSentence(c));
 
-		NLPGeneration ng = new NLPGeneration();
+		TemplateGenerator tg = new TemplateGenerator();
+		tg.initializeModels();
+		List<String> texts = new LinkedList<String>();
+		texts.add("This Samsung S8 mobile phone has a great screen and an awesome battery");
+		texts.add("My new skirt is red and its shape is fitting me perfectly");
+		tg.generateTemplate(texts);
+		System.exit(0);
 		
+		TextRealizer ng = new TextRealizer();
 		Template t = new Template();
 		t.objectName = "Samsung S8";
 		HashMap<String, String> hm = new HashMap<String, String>();
@@ -73,8 +85,8 @@ public class SimpleNLGTest {
 		// TODO: try something with same verb...
 		t.features=hm;
 		
-		String text = ng.generateTextFromTemplate(t);
-		System.out.println("plain:\t\t" + text);
+//		String text = ng.generateTextFromTemplate(t);
+//		System.out.println("plain:\t\t" + text);
 		String text2 = ng.generateCoordinateTextFromTemplate(t);
 		System.out.println("simple coord:\t" + text2);
 
