@@ -3,6 +3,7 @@ package de.dkt.eservices.analysis;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -114,11 +115,13 @@ public class CommonCrawlJSONParser {
 		
 	}
 	
+	
 	public static void main (String[] args){
 		
 		CommonCrawlJSONParser jp = new CommonCrawlJSONParser();
+		Analyser an = new Analyser();
 		
-		HashMap<String, ArrayList<String>> result = jp.getTopNAttributes("C:\\Users\\pebo01\\Desktop\\data\\commonCrawl\\json", 10);
+		HashMap<String, ArrayList<String>> result = jp.getTopNAttributes("C:\\Users\\pebo01\\Desktop\\data\\commonCrawl\\json", 20);
 		for (String key : result.keySet()){
 			System.out.println(key);
 			for (String attr : result.get(key)){
@@ -127,9 +130,30 @@ public class CommonCrawlJSONParser {
 			System.out.println("\n");
 		}
 		
-				
+		HashMap<String, HashMap<String, String>> headphoneMap = jp.JSON2Hash("C:\\Users\\pebo01\\Desktop\\data\\commonCrawl\\json\\TVCatalog.json");
 		
+		ArrayList<String> headphoneDescriptions = extractDescriptions(headphoneMap);
+		for (String s : headphoneDescriptions){
+			System.out.println(s);
+
+			
+		}
 		
+	}
+
+	private static ArrayList<String> extractDescriptions(HashMap<String, HashMap<String, String>> jsonMap) {
+
+		ArrayList<String> retlist = new ArrayList<String>();
+		
+		for (String id : jsonMap.keySet()){
+			HashMap<String, String> im = jsonMap.get(id);
+			String descr = im.containsKey("description") ? im.get("description") : null;
+			if (descr != null){
+				retlist.add(descr);
+			}
+		}
+		
+		return retlist;
 	}
 
 }

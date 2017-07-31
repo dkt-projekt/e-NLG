@@ -29,7 +29,7 @@ public class Analyser {
 	HeadFinder hf = new SemanticHeadFinder();
 	
 	final LexicalizedParser parser = LexicalizedParser.loadModel("edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz");
-	final Properties props = PropertiesUtils.asProperties("annotators", "tokenize,ssplit");//,pos,lemma");
+	final Properties props = PropertiesUtils.asProperties("annotators", "tokenize,ssplit,pos,lemma,parse");//,pos,lemma");
 	final StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 	
 	public String simpleCleaning(String input){
