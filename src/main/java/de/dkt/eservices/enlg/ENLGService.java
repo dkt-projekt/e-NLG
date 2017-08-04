@@ -5,14 +5,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.dkt.eservices.enlg.features.Feature;
+import de.dkt.eservices.enlg.features.FeatureExtractor;
+import de.dkt.eservices.enlg.linguistic.Sentence;
 import de.dkt.eservices.enlg.openccg.OpenCCG;
+import de.dkt.eservices.enlg.realization.SentenceExtractor;
 import de.dkt.eservices.enlg.realization.TextRealizer;
+import de.dkt.eservices.enlg.realization.TextRealizerFromExample;
 import de.dkt.eservices.enlg.template.Template;
 import de.dkt.eservices.enlg.template.TemplateGenerator;
 import de.dkt.eservices.enlg.template.TemplateParsing;
@@ -41,6 +48,39 @@ public class ENLGService {
 	
 	@Autowired
 	OpenCCG openccg;
+	
+	@Autowired
+	FeatureExtractor featureExtractor;
+	
+	@Autowired
+	TextRealizerFromExample textRealizer;
+	
+	@PostConstruct
+	public void initializeModels(){
+		featureExtractor = new FeatureExtractor();
+		featureExtractor.initializeModels();
+		textRealizer = new TextRealizerFromExample();
+		textRealizer.initializeModels();
+	}
+	
+	public static void main(String[] args) {
+		ENLGService service = new ENLGService();
+		service.initializeModels();
+		String output = service.generateDescription("headphone", "karrimor s2", "white, in-ear, wireless", "");
+		System.out.println("OUTPUT: "+output);
+	}
+	
+	public String generateDescription (String type, String name, String sFeatures, String language){
+		List<Feature> features = featureExtractor.extractFeaturesFromString(type, sFeatures);
+		
+//		System.out.println("Obtained features:");
+//		for (Feature feature : features) {
+//			System.out.println("\t"+feature.name + "--"+feature.values.toString()+"--"+feature.currentValue);
+//		}
+		String result = textRealizer.realizeText(type, name, features);
+//		System.out.println("FINAL text: \""+result+"\"");
+		return result;
+	}
 	
     public JSONObject generateTemplate(String inputText, String algorithm, String language) throws ExternalServiceFailedException, BadRequestException {
     	try {

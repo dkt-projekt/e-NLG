@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import de.dkt.eservices.enlg.linguistic.LinguisticFeature;
-import de.dkt.eservices.enlg.linguistic.ProductFeature;
+import de.dkt.eservices.enlg.linguistic.ProductType;
 import de.dkt.eservices.enlg.linguistic.Sentence;
 import de.dkt.eservices.enlg.template.Template;
 import simplenlg.framework.CoordinatedPhraseElement;
@@ -78,7 +78,7 @@ public class TextRealizer {
 		Set<Integer> keys = sentence.elements.keySet();
 		for (Integer key : keys) {
 			LinguisticFeature lf = sentence.elements.get(key);
-			if(lf instanceof ProductFeature){
+			if(lf instanceof ProductType){
 				
 				
 				

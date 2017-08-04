@@ -1,15 +1,17 @@
 package de.dkt.eservices.enlg.linguistic;
 
-public class ProductFeature implements LinguisticFeature{
+import org.json.JSONObject;
+
+public class FeatureValue implements LinguisticFeature{
 
 	public String name;
 	public String value;
 	
-	public ProductFeature() {
+	public FeatureValue() {
 		super();
 	}
 	
-	public ProductFeature(String name, String value) {
+	public FeatureValue(String name, String value) {
 		super();
 		this.name = name;
 		this.value = value;
@@ -31,4 +33,12 @@ public class ProductFeature implements LinguisticFeature{
 		this.value = value;
 	}
 	
+	public JSONObject getJSONObject(){
+		JSONObject json = new JSONObject();
+		json.put("type", "feature_value");
+		json.put("value", name);
+		return json;
+	}
+
+
 }
