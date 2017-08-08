@@ -42,6 +42,35 @@ public class ENLGRestController {//extends BaseRestController{
 	    ResponseEntity<String> response = new ResponseEntity<String>("The restcontroller is working properly", responseHeaders, HttpStatus.OK);
 	    return response;
 	}
+
+	@RequestMapping(value = "/e-nlg/generateDescription", method = {RequestMethod.POST})
+	public ResponseEntity<String> generateDescription(
+			HttpServletRequest request, 
+			@RequestParam(value = "productType", required = false) String type,
+			@RequestParam(value = "productName", required = false) String name,
+			@RequestParam(value = "productFeatures", required = false) String features,
+			@RequestParam(value = "language", required = false) String language,
+			@RequestHeader(value = "Accept", required = false) String acceptHeader,
+			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+            @RequestParam Map<String, String> allParams,
+			@RequestBody(required = false) String postBody) throws Exception {
+		try {
+			features = features.toLowerCase().trim();
+			name = name.toLowerCase().trim();
+			
+            String result = service.generateDescription(type, name, features, language);
+//			InteractionManagement.sendInteraction("dkt-usage@"+request.getRemoteAddr(), "usage", "e-NLG/generateTemplate", "Success", "", "Exception", "", "");
+            HttpHeaders responseHeaders = new HttpHeaders();
+//			responseHeaders.add("Content-Type", "text/plain; charset=utf-8");
+			responseHeaders.add("Access-Control-Allow-Origin", "*");
+			ResponseEntity<String> response = new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);
+			return response;
+		} catch (Exception e) {
+			logger.error("EXCEPTION: "+e.getMessage());
+//			InteractionManagement.sendInteraction("dkt-usage@"+request.getRemoteAddr(), "error", "e-NLG/generateTemplate", e.getMessage(), "", "Exception", e.getMessage(), "");
+			throw e;
+		}
+	}
 	
 	@RequestMapping(value = "/e-nlg/generateTemplate", method = {RequestMethod.POST})
 	public ResponseEntity<String> generateTemplate(

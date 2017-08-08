@@ -85,21 +85,21 @@ public class ENLGTest {
 //		System.out.println(response.getBody());
 //	}
 
-	@Test
-	public void test_2_generateTemplate() throws UnirestException, IOException,
-	Exception {
-		String input = "{\"texts\":"
-				+ "[\"Built-in microphone delivers clear sound when you are calling, makes the communication a feeling of face to face.\\nAnti-winding line and soft touch feeling, these wired earbuds are extremely comfortable in your ear.\\nMultifunctional control button controls microphone, one-button call control and music play.\\n3.5mm jack fits for all 3.5mm interface electronic devices.\\nHigh definition stereo earphone provides extremely exact and natural sound than traditional stereo.\""
-				+ "]"
-				+ "}";
-		HttpResponse<String> response = generateTemplateRequest()
-				.queryString("input", input)
-				.asString();
-		assertTrue(response.getStatus() == 200);
-		assertTrue(response.getBody().length() > 0);
-		System.out.println("Template output:");
-		System.out.println(response.getBody());
-	}
+//	@Test
+//	public void test_2_generateTemplate() throws UnirestException, IOException,
+//	Exception {
+//		String input = "{\"texts\":"
+//				+ "[\"Built-in microphone delivers clear sound when you are calling, makes the communication a feeling of face to face.\\nAnti-winding line and soft touch feeling, these wired earbuds are extremely comfortable in your ear.\\nMultifunctional control button controls microphone, one-button call control and music play.\\n3.5mm jack fits for all 3.5mm interface electronic devices.\\nHigh definition stereo earphone provides extremely exact and natural sound than traditional stereo.\""
+//				+ "]"
+//				+ "}";
+//		HttpResponse<String> response = generateTemplateRequest()
+//				.queryString("input", input)
+//				.asString();
+//		assertTrue(response.getStatus() == 200);
+//		assertTrue(response.getBody().length() > 0);
+//		System.out.println("Template output:");
+//		System.out.println(response.getBody());
+//	}
 
 //	@Test
 //	public void test_3_generateGrammar() throws UnirestException, IOException,

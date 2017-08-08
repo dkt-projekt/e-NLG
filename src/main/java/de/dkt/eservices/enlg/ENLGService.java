@@ -5,14 +5,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.dkt.eservices.enlg.features.Feature;
+import de.dkt.eservices.enlg.features.FeatureExtractor;
+import de.dkt.eservices.enlg.linguistic.Sentence;
 import de.dkt.eservices.enlg.openccg.OpenCCG;
+import de.dkt.eservices.enlg.realization.SentenceExtractor;
 import de.dkt.eservices.enlg.realization.TextRealizer;
+import de.dkt.eservices.enlg.realization.TextRealizerFromExample;
 import de.dkt.eservices.enlg.template.Template;
 import de.dkt.eservices.enlg.template.TemplateGenerator;
 import de.dkt.eservices.enlg.template.TemplateParsing;
@@ -42,6 +49,44 @@ public class ENLGService {
 	@Autowired
 	OpenCCG openccg;
 	
+	@Autowired
+	FeatureExtractor featureExtractor;
+	
+	@Autowired
+	TextRealizerFromExample textRealizer;
+	
+	@PostConstruct
+	public void initializeModels(){
+		featureExtractor = new FeatureExtractor();
+		featureExtractor.initializeModels();
+		textRealizer = new TextRealizerFromExample();
+		textRealizer.initializeModels();
+	}
+	
+	public static void main(String[] args) {
+		ENLGService service = new ENLGService();
+		service.initializeModels();
+		String output = service.generateDescription("tv", "karrimor s2", "sleep, 43 in, wireless", "");
+		System.out.println("OUTPUT: "+output);
+	}
+	
+	public String generateDescription (String type, String name, String sFeatures, String language){
+		List<Feature> features = featureExtractor.extractFeaturesFromString(type, sFeatures);
+		
+//		System.out.println("Obtained features:");
+//		for (Feature feature : features) {
+//			if(feature.values==null){
+//				System.out.println("\t"+feature.name + "--NULL--"+feature.currentValue);
+//			}
+//			else{
+//				System.out.println("\t"+feature.name + "--"+feature.values.toString()+"--"+feature.currentValue);
+//			}
+//		}
+		String result = textRealizer.realizeText(type, name, features);
+//		System.out.println("FINAL text: \""+result+"\"");
+		return result;
+	}
+	
     public JSONObject generateTemplate(String inputText, String algorithm, String language) throws ExternalServiceFailedException, BadRequestException {
     	try {
     		List<String> texts = new LinkedList<String>();
@@ -68,20 +113,20 @@ public class ENLGService {
 		for (String key : keys) {
 			features.put(key, json.getString(key));
 		}
-		resultText = realizer.generateJSONTextFromTemplate(inputTemplate, features);
+		resultText = null;//realizer.generateJSONTextFromTemplate(inputTemplate, features);
 		return resultText;
 	}
 
 	public String generateStringTextFromTemplate(String templateText, HashMap<String, String> features) {
 		String resultText = null;
 		Template inputTemplate = templateParsing.String2Template(templateText);
-		resultText = realizer.generateStringTextFromTemplate(inputTemplate, features);
+		resultText = null;//realizer.generateStringTextFromTemplate(inputTemplate, features);
 		return resultText;
 	}
 
 	public String generateGrammar(String input, String domain) {
 		try{
-			return openccg.generateGrammar(input, domain);
+			return null;//openccg.generateGrammar(input, domain);
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -91,7 +136,7 @@ public class ENLGService {
 
 	public String generateTextFromGrammar(String input, String domain) {
 		try{
-			return openccg.generateTextFromGrammar(input, domain);
+			return null;//openccg.generateTextFromGrammar(input, domain);
 		}
 		catch(Exception e){
 			e.printStackTrace();

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.json.JSONObject;
 
 import de.dkt.eservices.enlg.linguistic.Sentence;
@@ -42,6 +43,11 @@ public class Template {
 			jsonFeatures.put(key, features.get(key));
 		}
 		json.put("features", jsonFeatures);
+		JSONArray sentArray = new JSONArray();
+		for (Sentence s : sentences) {
+			sentArray.put(s.getJSONObject());
+		}
+		json.put("sentences", sentArray);
 		return json;
 	}
 }
