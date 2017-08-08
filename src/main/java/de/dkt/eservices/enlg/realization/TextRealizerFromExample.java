@@ -40,6 +40,7 @@ public class TextRealizerFromExample {
 	public HashMap<String, HashMap<String,HashMap<String,Integer>>> domainToFeatureToSentences;
 	public HashMap<String, HashMap<String, List<String>>> domainToFeatureValuesByName;
 	public HashMap<String, HashMap<String,Integer>> domainToBLABLA;
+	public HashMap<String, HashMap<String,Integer>> domainToProductNameSentences;
 	
 	public String folderPath = "jsonFiles/";
 	
@@ -68,6 +69,7 @@ public class TextRealizerFromExample {
 			//		domainToFeatureToSentences = new HashMap<String, HashMap<Feature,List<Sentence>>>();
 			domainToFeatureValuesByName = new HashMap<String, HashMap<String,List<String>>>();
 			domainToBLABLA = new HashMap<String, HashMap<String,Integer>>();
+			domainToProductNameSentences = new HashMap<String, HashMap<String,Integer>>();
 			domainToFeatureToSentences = new HashMap<String, HashMap<String,HashMap<String,Integer>>>();
 
 			String types[]= {"headphone","tv","phone"};
@@ -79,6 +81,8 @@ public class TextRealizerFromExample {
 				try{
 					ClassPathResource cpr = new ClassPathResource(folderPath + type + ".json");
 					jsonText = IOUtils.toString(new FileInputStream(cpr.getFile()));
+					//TODO If we want to do more sophisticated NLP then that could be a problem
+					jsonText = jsonText.toLowerCase();
 				}
 				catch(Exception e){
 					System.out.println("ERROR: at loading the jsonfile for: "+type);
@@ -121,6 +125,7 @@ public class TextRealizerFromExample {
 //				HashMap<Feature,List<Sentence>> features2Sentences = new HashMap<Feature,List<Sentence>>();
 
 				HashMap<String,Integer> blablaSentences = new HashMap<String, Integer>();
+				HashMap<String,Integer> productNameSentences = new HashMap<String, Integer>();
 				HashMap<String, HashMap<String,Integer>> fnToSentenceWithFrequency = new HashMap<String, HashMap<String,Integer>>();
 
 				for (int i = 0; i < array.length(); i++) {
@@ -163,7 +168,15 @@ public class TextRealizerFromExample {
 //							System.out.println("PTS1: "+pts2);
 //							System.out.println("PTS2: "+pts_replaced);
 							boolean isBlabla = true;
+							boolean hasProductName = false;
+							boolean hasGlobalFeature=false;
 							boolean hasFeature=false;
+//							System.out.println("PN: "+product_name);
+//							System.out.println("pts2: "+pts2);
+							if(pts2.matches(".*\\b"+Pattern.quote(product_name)+"\\b.*")){
+								hasProductName = true;
+							}
+
 							for (Feature feature : listFeatures) {
 //							for (String fn : featureNames) {
 								String fn = feature.name;
@@ -171,13 +184,15 @@ public class TextRealizerFromExample {
 								if(pts2.matches(".*\\b"+Pattern.quote(fn.replaceAll("_", " "))+"\\b.*")){
 									isBlabla = false;
 									hasFeature=true;
+									hasGlobalFeature=true;
 								}
 //								List<String> featureValues = featureValuesByName.get(fn);
 								List<String> featureValues = feature.values;
 								for (String fv : featureValues) {
 									if(pts2.matches(".*\\b"+Pattern.quote(fv.replaceAll("_", " "))+"\\b.*")){
 										isBlabla = false;
-										hasFeature=true;
+										hasFeature = true;
+										hasGlobalFeature=true;
 									}
 								}
 								if(hasFeature){
@@ -192,16 +207,27 @@ public class TextRealizerFromExample {
 									}
 								}
 							}
+							if(hasProductName && !hasGlobalFeature){
+								if(productNameSentences.containsKey(pts_replaced)){
+									productNameSentences.put(pts_replaced, productNameSentences.get(pts_replaced)+1);
+								}
+								else{
+									productNameSentences.put(pts_replaced, 1);
+								}
+							}
 							if(isBlabla){
 								if(pts2.matches(".*\\d.*")){
 									//TODO Maybe delete this part because sentences with digits are not being considered as BLABLA.
 								}
 								else{
-									if(blablaSentences.containsKey(pts2)){
-										blablaSentences.put(pts2, blablaSentences.get(pts2)+1);
-									}
-									else{
-										blablaSentences.put(pts2, 1);
+									String []parts = pts2.trim().split(" ");
+									if(parts.length>1 && parts.length<10){
+										if(blablaSentences.containsKey(pts2)){
+											blablaSentences.put(pts2, blablaSentences.get(pts2)+1);
+										}
+										else{
+											blablaSentences.put(pts2, 1);
+										}
 									}
 								}
 							}
@@ -209,6 +235,7 @@ public class TextRealizerFromExample {
 					}
 				}
 				domainToBLABLA.put(type, blablaSentences);
+				domainToProductNameSentences.put(type, productNameSentences);
 //				System.out.println("GENERAL features:");
 //				Set<String> kes = fnToSentenceWithFrequency.keySet();
 //				for (String feature : kes) {
@@ -219,13 +246,17 @@ public class TextRealizerFromExample {
 //						System.out.println("\t\t" + feature2);
 //					}
 //				}
-//				System.out.println("BLABLA:");
+//				System.out.println("BLABLA for: "+type);
 //				Set<String> kes2 = blablaSentences.keySet();
 //				for (String feature : kes2) {
 //					System.out.println("\t"+feature);
 //				}
+//				System.out.println("PNs for: "+type);
+//				Set<String> kes3 = productNameSentences.keySet();
+//				for (String feature : kes3) {
+//					System.out.println("\t"+feature);
+//				}
 				domainToFeatureToSentences.put(type, fnToSentenceWithFrequency);
-				
 			}
 		}
 		catch(Exception e){
@@ -265,6 +296,7 @@ public class TextRealizerFromExample {
 		List<String> finalSentences = new LinkedList<String>();
 		HashMap<String,HashMap<String,Integer>> featuresToSentences = domainToFeatureToSentences.get(type);
 		HashMap<String,Integer> blablaSentences = domainToBLABLA.get(type);
+		HashMap<String,Integer> productNameSentences = domainToProductNameSentences.get(type);
 		String result = "";
 		HashMap<String,Integer> sentencesForFeatures = new HashMap<String, Integer>();
 		
@@ -322,85 +354,117 @@ public class TextRealizerFromExample {
 			}
 		}
 		
-		System.out.println("List of all available sentences size: "+sentencesForFeatures.size());
+		//System.out.println("List of all available sentences size: "+sentencesForFeatures.size());
 		
 		Map<String,Integer> orderedMap = sortByValue(sentencesForFeatures, true);
 		Set<String> ked = sentencesForFeatures.keySet();
-		System.out.println("Suitable sentences:");
-		for (String string : ked) {
-			System.out.println("["+sentencesForFeatures.get(string)+"]" + string);
-		}
-		System.out.println("ordered");
+//		System.out.println("Suitable sentences:");
+//		for (String string : ked) {
+//			System.out.println("["+sentencesForFeatures.get(string)+"]" + string);
+//		}
+//		System.out.println("ordered");
 		Set<String> orderedSentences = orderedMap.keySet();
 		Iterator<String> orderedIterator = orderedSentences.iterator();
 		List<Feature> auxFeatures = new LinkedList<Feature>();
-		System.out.println("REAL features size: "+realFeatures.size());
-		System.out.println("NSFList size: "+notSupportedFeatures.size());
+//		System.out.println("REAL features size: "+realFeatures.size());
+//		System.out.println("NSFList size: "+notSupportedFeatures.size());
 		for (Feature feature : realFeatures) {
 			auxFeatures.add(feature);
 		}
-		
-		
-		String currentSentence = orderedIterator.next();
-		System.out.println("CS Out: "+currentSentence);
-		while(!auxFeatures.isEmpty()){
-			result += " " + fillString(currentSentence, features, name, type);
-			System.out.println("RESULT: "+result);
-			Matcher fnm = Pattern.compile("\\bFEATURENAME\\d+\\b").matcher(currentSentence);
-			while (fnm.find()){
-				String fn = fnm.group();
-				Iterator<Feature> itFeatures = auxFeatures.iterator();
-				while(itFeatures.hasNext()){
-					Feature fNext = itFeatures.next();
-					if(fn.equals("FEATURENAME"+fNext.featureId)){
-						auxFeatures.remove(fNext);
-						System.out.println("REMOVING: "+fNext.featureId);
-					}
-				}
-			}
-			Matcher fvm = Pattern.compile("\\bFEATUREVALUE\\d+\\b").matcher(currentSentence);
-			while (fvm.find()){
-				String fv = fvm.group();
-				Iterator<Feature> itFeatures = auxFeatures.iterator();
-				while(itFeatures.hasNext()){
-					Feature fNext = itFeatures.next();
-					if(fv.equals("FEATUREVALUE"+fNext.featureId)){
-						auxFeatures.remove(fNext);
-						System.out.println("REMOVING: "+fNext.featureId);
-					}
-				}
-			}
-			System.out.println("finished removing");
-			if(auxFeatures.isEmpty()){
-				System.out.println("AuxFEATURES is EMPTY");
+
+		int pnPosition = (int)(Math.random()*productNameSentences.size());
+		int counterPN = 0;
+		Set<String> productNameKeys = productNameSentences.keySet();
+		for (String string : productNameKeys) {
+			if(counterPN==pnPosition){
+				result += fillString(string, null, name, type);
 				break;
 			}
-			if(orderedIterator.hasNext()){
-				System.out.println("Iterator has next.1.");
-				currentSentence = orderedIterator.next();
-			}
-			while(!sentenceIsValidForFeatures(currentSentence,auxFeatures) && orderedIterator.hasNext()){
-				System.out.println("Loop finding next sentences.");
-				currentSentence = orderedIterator.next();
+			counterPN++;
+		}
+
+		if(orderedIterator.hasNext()){
+			String currentSentence = orderedIterator.next();
+//			System.out.println("CS Out: "+currentSentence);
+			while(!auxFeatures.isEmpty()){
+				String auxResult = fillString(currentSentence, features, name, type);
+				auxResult = auxResult.substring(0, 1).toUpperCase() + auxResult.substring(1);
+				result += " * " + auxResult + "\n";
+
+//				System.out.println("RESULT: "+result);
+				Matcher fnm = Pattern.compile("\\bFEATURENAME\\d+\\b").matcher(currentSentence);
+				while (fnm.find()){
+					String fn = fnm.group();
+					List<Feature> featuresToRemove = new LinkedList<Feature>();
+					Iterator<Feature> itFeatures = auxFeatures.iterator();
+					while(itFeatures.hasNext()){
+						Feature fNext = itFeatures.next();
+						if(fn.equals("FEATURENAME"+fNext.featureId)){
+							featuresToRemove.add(fNext);
+//							auxFeatures.remove(fNext);
+//							System.out.println("REMOVING: "+fNext.featureId);
+						}
+					}
+					for (Feature feature : featuresToRemove) {
+						auxFeatures.remove(feature);
+					}
+				}
+				Matcher fvm = Pattern.compile("\\bFEATUREVALUE\\d+\\b").matcher(currentSentence);
+				while (fvm.find()){
+					String fv = fvm.group();
+					List<Feature> featuresToRemove = new LinkedList<Feature>();
+					Iterator<Feature> itFeatures = auxFeatures.iterator();
+					while(itFeatures.hasNext()){
+						Feature fNext = itFeatures.next();
+						if(fv.equals("FEATUREVALUE"+fNext.featureId)){
+							featuresToRemove.add(fNext);
+//							auxFeatures.remove(fNext);
+//							System.out.println("REMOVING: "+fNext.featureId);
+						}
+					}
+					for (Feature feature : featuresToRemove) {
+						auxFeatures.remove(feature);
+					}
+				}
+//				System.out.println("finished removing");
+				if(auxFeatures.isEmpty()){
+//					System.out.println("AuxFEATURES is EMPTY");
+					break;
+				}
+				if(orderedIterator.hasNext()){
+//					System.out.println("Iterator has next.1.");
+					currentSentence = orderedIterator.next();
+				}
+//				System.out.println("SIZE OF AUXFEATURES: "+auxFeatures.size());
+				while(!sentenceIsValidForFeatures(currentSentence,auxFeatures) && orderedIterator.hasNext()){
+//					System.out.println("Loop finding next sentences.");
+					currentSentence = orderedIterator.next();
+				}
 			}
 		}
+
+//		result += "\n";
+
 		if(!notSupportedFeatures.isEmpty()){
 			result += "\nWe are sorry but the next features are not supported by now. We just provided a bullet list: \n";
 			for (Feature feature : notSupportedFeatures) {
 				if(feature.currentValue!=null){
-					result += " - "+feature.name + ": " + feature.currentValue + "\n";
+					result += " - "+"<span class=\"label label-primary\">"+feature.name+"</span>" + ": " + "<span class=\"label label-info\">"+feature.currentValue +"</span>" + "\n";
 				}
 				else{
-					result += " - "+feature.name + "\n";
+					result += " - "+"<span class=\"label label-primary\">"+feature.name+"</span>" + "\n";
 				}
 			}
 		}
-		
+
+//		result += "\n";
+
 		int bbPosition = (int)(Math.random()*blablaSentences.size());
 		int counter = 0;
 		Set<String> blablaKeys = blablaSentences.keySet();
 		for (String string : blablaKeys) {
 			if(counter==bbPosition){
+				string = string.substring(0, 1).toUpperCase() + string.substring(1);
 				result += string;
 				break;
 			}
@@ -438,45 +502,47 @@ public class TextRealizerFromExample {
 		return false;
 	}
 
-	public String realizeText_Old(String type, String name, List<Feature> features){
-		List<String> finalSentences = new LinkedList<String>();
-		HashMap<String,HashMap<String,Integer>> featuresToSentences = domainToFeatureToSentences.get(type);
-		String result = "";
-		for (Feature f : features) {
-			
-			//TODO Look for sentences that include more than one feature.
-						
-//			System.out.println("NAME:"+ f.name);
-			String featureKey = f.name+f.featureId;
-			if(featuresToSentences.containsKey(featureKey)){
-				//TODO get one of the options based on probabilities and if it is containing another features or not.				
-				String sentence = "";
-				System.out.println("NUMBER OF SENTENCES: "+featuresToSentences.get(featureKey).size());
-				int position = (int)(Math.random()*featuresToSentences.get(featureKey).size());
-				System.out.println("RANDOM POSITION: "+position);
-				HashMap<String, Integer> map = featuresToSentences.get(featureKey);
-				int counter = 0;
-				Set<String> sentences = map.keySet();
-				for (String string : sentences) {
-					if(counter==position){
-						sentence = string;
-						break;
-					}
-					counter++;
-				}
-				System.out.println("SENTENCES: "+sentence);
-				result += " " + fillString(sentence, f, name, type);
-			}			
-		}
-		return result.trim();
-	}
+//	public String realizeText_Old(String type, String name, List<Feature> features){
+//		List<String> finalSentences = new LinkedList<String>();
+//		HashMap<String,HashMap<String,Integer>> featuresToSentences = domainToFeatureToSentences.get(type);
+//		String result = "";
+//		for (Feature f : features) {
+//			
+//			//TODO Look for sentences that include more than one feature.
+//						
+////			System.out.println("NAME:"+ f.name);
+//			String featureKey = f.name+f.featureId;
+//			if(featuresToSentences.containsKey(featureKey)){
+//				//TODO get one of the options based on probabilities and if it is containing another features or not.				
+//				String sentence = "";
+//				System.out.println("NUMBER OF SENTENCES: "+featuresToSentences.get(featureKey).size());
+//				int position = (int)(Math.random()*featuresToSentences.get(featureKey).size());
+//				System.out.println("RANDOM POSITION: "+position);
+//				HashMap<String, Integer> map = featuresToSentences.get(featureKey);
+//				int counter = 0;
+//				Set<String> sentences = map.keySet();
+//				for (String string : sentences) {
+//					if(counter==position){
+//						sentence = string;
+//						break;
+//					}
+//					counter++;
+//				}
+//				System.out.println("SENTENCES: "+sentence);
+//				result += " " + fillString(sentence, f, name, type);
+//			}			
+//		}
+//		return result.trim();
+//	}
 
 	private String fillString(String sentence, List<Feature> features, String product_name, String product_type) {
-		String result = sentence.replaceAll("PRODUCTTYPE", product_type);
-		result = result.replaceAll("PRODUCTNAME", product_name);
-		for (Feature f : features) {
-			result = result.replaceAll("FEATURENAME"+f.featureId, f.name);
-			result = result.replaceAll("FEATUREVALUE"+f.featureId, f.currentValue);
+		String result = sentence.replaceAll("PRODUCTTYPE", "<span class=\"label label-warning\">"+product_type+"</span>");
+		result = result.replaceAll("PRODUCTNAME", "<span class=\"label label-danger\">"+product_name+"</span>");
+		if(features!=null){
+			for (Feature f : features) {
+				result = result.replaceAll("FEATURENAME"+f.featureId, "<span class=\"label label-success\">"+f.name+"</span>");
+				result = result.replaceAll("FEATUREVALUE"+f.featureId, "<span class=\"label label-success\">"+f.currentValue+"</span>");
+			}
 		}
 		return result;
 	}

@@ -649,8 +649,8 @@ public class TemplateGenerator {
 //					}
 				}
 			}
-			Set<String> keys = featureValuesByName.keySet();
-			for (String key : keys) {
+			Set<String> keys2 = featureValuesByName.keySet();
+			for (String key : keys2) {
 				if(!verbsForFeatures.containsKey(key)){
 					verbsForFeatures.put(key, new LinkedList<String>());
 				}
@@ -668,7 +668,7 @@ public class TemplateGenerator {
 				}
 			}
 			boolean isBlabla = true;
-			for (String fn : keys) {
+			for (String fn : keys2) {
 				if(pts.matches(".*\\b"+fn+"\\b.*")){
 //					System.out.println("MATCH: "+fn);
 					isBlabla = false;

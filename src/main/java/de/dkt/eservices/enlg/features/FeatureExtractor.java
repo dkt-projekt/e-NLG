@@ -41,6 +41,9 @@ public class FeatureExtractor {
 				File f = cpr.getFile();
 //				System.out.println("PATH: "+f.getAbsolutePath());
 				String jsonText = IOUtils.toString(new FileInputStream(f));
+				//TODO If we want to do more sophisticated NLP then that could be a problem
+				jsonText = jsonText.toLowerCase();
+
 //				System.out.println("JSONTEXT: "+jsonText);
 				JSONArray array = new JSONArray(jsonText);
 				for (int i = 0; i < array.length(); i++) {
@@ -123,11 +126,15 @@ public class FeatureExtractor {
 						break;
 					}
 				}
+				if(isFound){
+					break;
+				}
 			}
 			if(!isFound){
 				productFeatures.add(new Feature(null,sFeature,null,null));
 			}
 		}
+		
 		return productFeatures;
 	}
 	

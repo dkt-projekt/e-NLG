@@ -66,7 +66,7 @@ public class ENLGService {
 	public static void main(String[] args) {
 		ENLGService service = new ENLGService();
 		service.initializeModels();
-		String output = service.generateDescription("headphone", "karrimor s2", "white, in-ear, wireless", "");
+		String output = service.generateDescription("tv", "karrimor s2", "sleep, 43 in, wireless", "");
 		System.out.println("OUTPUT: "+output);
 	}
 	
@@ -75,7 +75,12 @@ public class ENLGService {
 		
 //		System.out.println("Obtained features:");
 //		for (Feature feature : features) {
-//			System.out.println("\t"+feature.name + "--"+feature.values.toString()+"--"+feature.currentValue);
+//			if(feature.values==null){
+//				System.out.println("\t"+feature.name + "--NULL--"+feature.currentValue);
+//			}
+//			else{
+//				System.out.println("\t"+feature.name + "--"+feature.values.toString()+"--"+feature.currentValue);
+//			}
 //		}
 		String result = textRealizer.realizeText(type, name, features);
 //		System.out.println("FINAL text: \""+result+"\"");
@@ -108,20 +113,20 @@ public class ENLGService {
 		for (String key : keys) {
 			features.put(key, json.getString(key));
 		}
-		resultText = realizer.generateJSONTextFromTemplate(inputTemplate, features);
+		resultText = null;//realizer.generateJSONTextFromTemplate(inputTemplate, features);
 		return resultText;
 	}
 
 	public String generateStringTextFromTemplate(String templateText, HashMap<String, String> features) {
 		String resultText = null;
 		Template inputTemplate = templateParsing.String2Template(templateText);
-		resultText = realizer.generateStringTextFromTemplate(inputTemplate, features);
+		resultText = null;//realizer.generateStringTextFromTemplate(inputTemplate, features);
 		return resultText;
 	}
 
 	public String generateGrammar(String input, String domain) {
 		try{
-			return openccg.generateGrammar(input, domain);
+			return null;//openccg.generateGrammar(input, domain);
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -131,7 +136,7 @@ public class ENLGService {
 
 	public String generateTextFromGrammar(String input, String domain) {
 		try{
-			return openccg.generateTextFromGrammar(input, domain);
+			return null;//openccg.generateTextFromGrammar(input, domain);
 		}
 		catch(Exception e){
 			e.printStackTrace();

@@ -55,6 +55,9 @@ public class ENLGRestController {//extends BaseRestController{
             @RequestParam Map<String, String> allParams,
 			@RequestBody(required = false) String postBody) throws Exception {
 		try {
+			features = features.toLowerCase().trim();
+			name = name.toLowerCase().trim();
+			
             String result = service.generateDescription(type, name, features, language);
 //			InteractionManagement.sendInteraction("dkt-usage@"+request.getRemoteAddr(), "usage", "e-NLG/generateTemplate", "Success", "", "Exception", "", "");
             HttpHeaders responseHeaders = new HttpHeaders();
