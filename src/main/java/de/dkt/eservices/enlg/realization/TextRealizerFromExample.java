@@ -1,7 +1,5 @@
 package de.dkt.eservices.enlg.realization;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,8 +19,6 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.neo4j.cypher.internal.compiler.v2_1.ast.Foreach;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
