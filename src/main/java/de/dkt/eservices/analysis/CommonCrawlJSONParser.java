@@ -121,7 +121,7 @@ public class CommonCrawlJSONParser {
 		CommonCrawlJSONParser jp = new CommonCrawlJSONParser();
 		Analyser an = new Analyser();
 		
-		HashMap<String, ArrayList<String>> result = jp.getTopNAttributes("C:\\Users\\pebo01\\Desktop\\data\\commonCrawl\\json", 20);
+		HashMap<String, ArrayList<String>> result = jp.getTopNAttributes("/Users/jumo04/Downloads/json/", 200);
 		for (String key : result.keySet()){
 			System.out.println(key);
 			for (String attr : result.get(key)){
@@ -130,14 +130,14 @@ public class CommonCrawlJSONParser {
 			System.out.println("\n");
 		}
 		
-		HashMap<String, HashMap<String, String>> headphoneMap = jp.JSON2Hash("C:\\Users\\pebo01\\Desktop\\data\\commonCrawl\\json\\TVCatalog.json");
-		
-		ArrayList<String> headphoneDescriptions = extractDescriptions(headphoneMap);
-		for (String s : headphoneDescriptions){
-			System.out.println(s);
-
-			
-		}
+//		HashMap<String, HashMap<String, String>> headphoneMap = jp.JSON2Hash("C:\\Users\\pebo01\\Desktop\\data\\commonCrawl\\json\\TVCatalog.json");
+//		
+//		ArrayList<String> headphoneDescriptions = extractDescriptions(headphoneMap);
+//		for (String s : headphoneDescriptions){
+//			System.out.println(s);
+//
+//			
+//		}
 		
 	}
 
