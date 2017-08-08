@@ -367,6 +367,7 @@ public class TextRealizerFromExample {
 //		System.out.println("NSFList size: "+notSupportedFeatures.size());
 		for (Feature feature : realFeatures) {
 			auxFeatures.add(feature);
+//			System.out.println("ADDING REAL FEATURE:" + feature.name+'_'+feature.featureId);
 		}
 
 		int pnPosition = (int)(Math.random()*productNameSentences.size());
@@ -379,7 +380,7 @@ public class TextRealizerFromExample {
 			}
 			counterPN++;
 		}
-
+//		System.out.println("ordered it size:" + orderedSentences.size());
 		if(orderedIterator.hasNext()){
 			String currentSentence = orderedIterator.next();
 //			System.out.println("CS Out: "+currentSentence);
@@ -399,7 +400,7 @@ public class TextRealizerFromExample {
 						if(fn.equals("FEATURENAME"+fNext.featureId)){
 							featuresToRemove.add(fNext);
 //							auxFeatures.remove(fNext);
-//							System.out.println("REMOVING: "+fNext.featureId);
+//							System.out.println("REMOVING name: "+fNext.featureId+'_'+fNext.name);
 						}
 					}
 					for (Feature feature : featuresToRemove) {
@@ -413,10 +414,13 @@ public class TextRealizerFromExample {
 					Iterator<Feature> itFeatures = auxFeatures.iterator();
 					while(itFeatures.hasNext()){
 						Feature fNext = itFeatures.next();
+//						System.out.println("debugging fv:"+ fv);
+//						System.out.println("debugging name id:"+ fNext.featureId);
+
 						if(fv.equals("FEATUREVALUE"+fNext.featureId)){
 							featuresToRemove.add(fNext);
 //							auxFeatures.remove(fNext);
-//							System.out.println("REMOVING: "+fNext.featureId);
+//							System.out.println("REMOVING value: "+fNext.featureId+'_'+fNext.name);
 						}
 					}
 					for (Feature feature : featuresToRemove) {
@@ -431,16 +435,30 @@ public class TextRealizerFromExample {
 				if(orderedIterator.hasNext()){
 //					System.out.println("Iterator has next.1.");
 					currentSentence = orderedIterator.next();
+					while(!sentenceIsValidForFeatures(currentSentence,auxFeatures) && orderedIterator.hasNext()){
+//						System.out.println("Loop finding next sentences.");
+						currentSentence = orderedIterator.next();
+					}
+				}
+				else{
+					break;
 				}
 //				System.out.println("SIZE OF AUXFEATURES: "+auxFeatures.size());
-				while(!sentenceIsValidForFeatures(currentSentence,auxFeatures) && orderedIterator.hasNext()){
-//					System.out.println("Loop finding next sentences.");
-					currentSentence = orderedIterator.next();
-				}
 			}
 		}
 
 //		result += "\n";
+		if(!auxFeatures.isEmpty()){
+			result += "\nThere was no available sentence example for the next features: \n";
+			for (Feature feature : auxFeatures) {
+				if(feature.currentValue!=null){
+					result += " - "+"<span class=\"label label-primary\">"+feature.name+"</span>" + ": " + "<span class=\"label label-info\">"+feature.currentValue +"</span>" + "\n";
+				}
+				else{
+					result += " - "+"<span class=\"label label-primary\">"+feature.name+"</span>" + "\n";
+				}
+			}
+		}
 
 		if(!notSupportedFeatures.isEmpty()){
 			result += "\nWe are sorry but the next features are not supported by now. We just provided a bullet list: \n";

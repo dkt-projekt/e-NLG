@@ -66,7 +66,7 @@ public class ENLGService {
 	public static void main(String[] args) {
 		ENLGService service = new ENLGService();
 		service.initializeModels();
-		String output = service.generateDescription("tv", "karrimor s2", "sleep, 43 in, wireless", "");
+		String output = service.generateDescription("tv", "karrimor s2", "4k uhdtv (2160p), 178 degrees", "");
 		System.out.println("OUTPUT: "+output);
 	}
 	
