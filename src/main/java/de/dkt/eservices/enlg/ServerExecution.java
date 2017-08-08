@@ -6,9 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @SpringBootApplication
-@EnableAutoConfiguration(exclude = {
-	    org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class,
-	    org.springframework.boot.actuate.autoconfigure.ManagementSecurityAutoConfiguration.class})
+//@EnableAutoConfiguration(exclude = {
+//	    org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class,
+//	    org.springframework.boot.actuate.autoconfigure.ManagementSecurityAutoConfiguration.class})
+@EnableAutoConfiguration
 public class ServerExecution {
 
 	public static void main(String[] args) {
