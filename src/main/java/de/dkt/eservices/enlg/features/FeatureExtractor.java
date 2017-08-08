@@ -36,11 +36,13 @@ public class FeatureExtractor {
 			List<Feature> features= new LinkedList<Feature>();
 			HashMap<String, List<String>> featureValuesByName = new HashMap<String, List<String>>();
 			ClassPathResource cpr = new ClassPathResource(folderPath + type + ".json");
+			System.out.println(cpr.getPath());
 			//File f = new File(folderPath + type + ".json");
 			try{
-				File f = cpr.getFile();
+//				File f = cpr.getFile();
 //				System.out.println("PATH: "+f.getAbsolutePath());
-				String jsonText = IOUtils.toString(new FileInputStream(f));
+				String jsonText = IOUtils.toString(cpr.getInputStream());
+//				String jsonText = IOUtils.toString(new FileInputStream(f));
 				//TODO If we want to do more sophisticated NLP then that could be a problem
 				jsonText = jsonText.toLowerCase();
 

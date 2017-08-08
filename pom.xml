@@ -31,6 +31,20 @@
         </descriptorRefs>
       </configuration>
     </plugin>
+    	    <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>de.dkt.eservices.enlg.ServerExecution</mainClass>
+                </configuration>
+                  <executions>
+                    <execution>
+                      <goals>
+                      </goals>
+                    </execution>
+                </executions>
+            </plugin>
+    
     </plugins>
   </build>
 	<properties>

@@ -80,7 +80,8 @@ public class TextRealizerFromExample {
 				String jsonText ="";
 				try{
 					ClassPathResource cpr = new ClassPathResource(folderPath + type + ".json");
-					jsonText = IOUtils.toString(new FileInputStream(cpr.getFile()));
+					jsonText = IOUtils.toString(cpr.getInputStream());
+//					jsonText = IOUtils.toString(new FileInputStream(cpr.getFile()));
 					//TODO If we want to do more sophisticated NLP then that could be a problem
 					jsonText = jsonText.toLowerCase();
 				}
